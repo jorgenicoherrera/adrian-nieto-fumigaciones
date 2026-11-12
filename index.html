@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#06140c">
+  <meta name="description" content="Solicitá tu turno de fumigación en toda la provincia de La Rioja. Adrián Nieto Fumigaciones: control y prevención de plagas.">
+  <title>Adrián Nieto Fumigaciones | Solicitar turno</title>
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <style>
+    :root {
+      --verde-oscuro: #0b3d20;
+      --verde: #1ea74f;
+      --verde-claro: #3ddc7a;
+      --negro: #070b09;
+      --blanco: #ffffff;
+      --gris: #a9b8af;
+      --borde: rgba(255, 255, 255, 0.14);
+      --error: #ff6b6b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { -webkit-text-size-adjust: 100%; }
+
+    body {
+      font-family: "Segoe UI", system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+      color: var(--blanco);
+      background:
+        radial-gradient(120% 60% at 50% 0%, var(--verde-oscuro) 0%, transparent 70%),
+        var(--negro);
+      min-height: 100vh;
+      min-height: 100dvh;
+      line-height: 1.45;
+    }
+
+    .contenedor {
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 28px 20px 40px;
+    }
+
+    .oculto { display: none !important; }
+
+    /* ---------- Pantalla principal ---------- */
+    #inicio {
+      min-height: calc(100dvh - 68px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 6px;
+    }
+
+    .logo {
+      width: 150px;
+      height: auto;
+      border-radius: 14px;
+      filter: drop-shadow(0 10px 24px rgba(30, 167, 79, 0.35));
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      font-size: 2rem;
+      line-height: 1.05;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+
+    h1 span {
+      display: block;
+      color: var(--verde);
+      font-size: 1.55rem;
+      letter-spacing: 0.06em;
+    }
+
+    .eslogan {
+      margin-top: 10px;
+      color: var(--gris);
+      font-size: 1rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .cobertura {
+      margin-top: 6px;
+      color: var(--gris);
+      font-size: 0.9rem;
+    }
+
+    .btn-principal {
+      margin-top: 34px;
+      width: 100%;
+      padding: 20px 16px;
+      border: none;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--verde) 0%, #138a3c 100%);
+      color: var(--blanco);
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 12px 28px rgba(30, 167, 79, 0.35);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .btn-principal:active { transform: scale(0.98); }
+    .btn-principal:focus-visible { outline: 3px solid var(--blanco); outline-offset: 3px; }
+
+    /* ---------- Formulario ---------- */
+    .cabecera-form {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .cabecera-form img {
+      width: 44px;
+      height: auto;
+      border-radius: 8px;
+    }
+
+    .cabecera-form h2 {
+      font-size: 1.25rem;
+      line-height: 1.15;
+    }
+
+    .cabecera-form p {
+      color: var(--gris);
+      font-size: 0.85rem;
+    }
+
+    form {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--borde);
+      border-radius: 18px;
+      padding: 20px 16px 22px;
+    }
+
+    .campo { margin-bottom: 16px; }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    label small {
+      color: var(--gris);
+      font-weight: 400;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 14px 12px;
+      font: inherit;
+      font-size: 1rem; /* evita el zoom automático en iPhone */
+      color: var(--blanco);
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid var(--borde);
+      border-radius: 12px;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    select {
+      background-image:
+        linear-gradient(45deg, transparent 50%, var(--verde-claro) 50%),
+        linear-gradient(135deg, var(--verde-claro) 50%, transparent 50%);
+      background-position: calc(100% - 20px) 55%, calc(100% - 14px) 55%;
+      background-size: 6px 6px, 6px 6px;
+      background-repeat: no-repeat;
+      padding-right: 38px;
+    }
+
+    select option { color: #000; background: #fff; }
+
+    input[type="date"] { color-scheme: dark; min-height: 50px; }
+
+    textarea { min-height: 90px; resize: vertical; }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--verde);
+      box-shadow: 0 0 0 3px rgba(30, 167, 79, 0.3);
+    }
+
+    .invalido { border-color: var(--error) !important; }
+
+    .error-msg {
+      display: none;
+      color: var(--error);
+      font-size: 0.82rem;
+      margin-top: 5px;
+    }
+
+    .campo.con-error .error-msg { display: block; }
+
+    .fila {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+
+    .btn-enviar {
+      width: 100%;
+      margin-top: 6px;
+      padding: 18px 16px;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--verde) 0%, #138a3c 100%);
+      color: var(--blanco);
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .btn-enviar:active { transform: scale(0.98); }
+
+    .btn-volver {
+      display: block;
+      width: 100%;
+      margin-top: 12px;
+      padding: 14px;
+      background: transparent;
+      border: 1px solid var(--borde);
+      border-radius: 14px;
+      color: var(--gris);
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+
+    .nota {
+      margin-top: 14px;
+      text-align: center;
+      color: var(--gris);
+      font-size: 0.8rem;
+    }
+
+    /* ---------- Confirmación ---------- */
+    #confirmacion {
+      text-align: center;
+      padding-top: 30px;
+    }
+
+    .tilde {
+      width: 76px;
+      height: 76px;
+      margin: 0 auto 18px;
+      border-radius: 50%;
+      background: var(--verde);
+      display: grid;
+      place-items: center;
+      font-size: 2.4rem;
+      box-shadow: 0 10px 26px rgba(30, 167, 79, 0.4);
+    }
+
+    #confirmacion h2 { font-size: 1.5rem; margin-bottom: 10px; }
+
+    .aviso {
+      background: rgba(30, 167, 79, 0.12);
+      border: 1px solid rgba(30, 167, 79, 0.5);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin: 16px 0 22px;
+      font-size: 0.98rem;
+    }
+
+    .btn-wa {
+      display: block;
+      width: 100%;
+      padding: 17px 16px;
+      border-radius: 14px;
+      background: #25d366;
+      color: #04210f;
+      font-size: 1.05rem;
+      font-weight: 800;
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+  </style>
+</head>
+<body>
+  <main class="contenedor">
+
+    <!-- 1. PANTALLA PRINCIPAL -->
+    <section id="inicio">
+      <img class="logo" src="assets/logo.png" alt="Logo de Adrián Nieto Fumigaciones">
+      <h1>Adrián Nieto <span>Fumigaciones</span></h1>
+      <p class="eslogan">Control y prevención de plagas</p>
+      <p class="cobertura">Atendemos toda la provincia de La Rioja</p>
+      <button type="button" class="btn-principal" id="btnSolicitar">Solicitar turno</button>
+    </section>
+
+    <!-- 2. FORMULARIO -->
+    <section id="pantallaForm" class="oculto">
+      <div class="cabecera-form">
+        <img src="assets/logo.png" alt="">
+        <div>
+          <h2>Solicitar turno</h2>
+          <p>Completá los datos y te respondemos por WhatsApp.</p>
+        </div>
+      </div>
+
+      <form id="formTurno" novalidate>
+        <div class="campo">
+          <label for="nombre">Nombre y apellido</label>
+          <input type="text" id="nombre" name="nombre" autocomplete="name" maxlength="80" placeholder="Ej: Juan Pérez">
+          <span class="error-msg">Ingresá tu nombre y apellido.</span>
+        </div>
+
+        <div class="campo">
+          <label for="telefono">Teléfono <small>(con código de área)</small></label>
+          <input type="tel" id="telefono" name="telefono" autocomplete="tel" inputmode="tel" maxlength="20" placeholder="Ej: 3804 123456">
+          <span class="error-msg">Ingresá un teléfono válido (entre 8 y 13 números).</span>
+        </div>
+
+        <div class="campo">
+          <label for="localidad">Localidad</label>
+          <input type="text" id="localidad" name="localidad" list="listaLocalidades" maxlength="60" placeholder="Elegí o escribí tu localidad">
+          <datalist id="listaLocalidades">
+            <option value="La Rioja Capital">
+            <option value="Chilecito">
+            <option value="Aimogasta">
+            <option value="Chamical">
+            <option value="Chepes">
+            <option value="Villa Unión">
+            <option value="Famatina">
+            <option value="Nonogasta">
+            <option value="Anillaco">
+            <option value="Arauco">
+            <option value="Aminga">
+            <option value="Tama">
+            <option value="Olta">
+            <option value="Patquía">
+            <option value="Ulapes">
+            <option value="Villa Mazán">
+            <option value="Sanagasta">
+            <option value="Vinchina">
+            <option value="Malanzán">
+            <option value="Milagro">
+          </datalist>
+          <span class="error-msg">Indicá tu localidad.</span>
+        </div>
+
+        <div class="campo">
+          <label for="direccion">Dirección</label>
+          <input type="text" id="direccion" name="direccion" autocomplete="street-address" maxlength="120" placeholder="Calle, número, barrio">
+          <span class="error-msg">Ingresá la dirección del servicio.</span>
+        </div>
+
+        <div class="campo">
+          <label for="servicio">Tipo de servicio o plaga</label>
+          <select id="servicio" name="servicio">
+            <option value="">Seleccioná una opción</option>
+            <option>Cucarachas</option>
+            <option>Hormigas</option>
+            <option>Arañas</option>
+            <option>Escorpiones (alacranes)</option>
+            <option>Roedores (ratas y ratones)</option>
+            <option>Moscas y mosquitos</option>
+            <option>Chinches</option>
+            <option>Pulgas y garrapatas</option>
+            <option>Termitas</option>
+            <option>Fumigación preventiva general</option>
+            <option>Otro / no sé qué plaga es</option>
+          </select>
+          <span class="error-msg">Elegí el tipo de servicio o plaga.</span>
+        </div>
+
+        <div class="campo">
+          <label for="propiedad">Tipo de propiedad</label>
+          <select id="propiedad" name="propiedad">
+            <option value="">Seleccioná una opción</option>
+            <option>Casa</option>
+            <option>Departamento</option>
+            <option>Local comercial</option>
+            <option>Oficina</option>
+            <option>Restaurante / gastronomía</option>
+            <option>Galpón / depósito</option>
+            <option>Establecimiento rural</option>
+            <option>Otro</option>
+          </select>
+          <span class="error-msg">Elegí el tipo de propiedad.</span>
+        </div>
+
+        <div class="campo">
+          <label for="fecha">Fecha preferida</label>
+          <input type="date" id="fecha" name="fecha">
+          <span class="error-msg">Elegí una fecha de hoy en adelante.</span>
+        </div>
+
+        <div class="campo">
+          <label for="horario">Horario preferido</label>
+          <select id="horario" name="horario">
+            <option value="">Seleccioná una opción</option>
+            <option>Mañana (8 a 12 hs)</option>
+            <option>Tarde (12 a 18 hs)</option>
+            <option>Noche (18 a 22 hs)</option>
+            <option>Urgente / cualquier horario</option>
+          </select>
+          <span class="error-msg">Elegí un horario preferido.</span>
+        </div>
+
+        <div class="campo">
+          <label for="observaciones">Observaciones <small>(opcional)</small></label>
+          <textarea id="observaciones" name="observaciones" maxlength="400" placeholder="Contanos algo más: mascotas, niños, zonas afectadas, etc."></textarea>
+        </div>
+
+        <button type="submit" class="btn-enviar">Enviar por WhatsApp</button>
+        <button type="button" class="btn-volver" id="btnVolver">Volver</button>
+        <p class="nota">Al enviar se abrirá WhatsApp con tu solicitud lista para mandar.</p>
+      </form>
+    </section>
+
+    <!-- 3. CONFIRMACIÓN -->
+    <section id="confirmacion" class="oculto" aria-live="polite">
+      <div class="tilde" aria-hidden="true">✓</div>
+      <h2>¡Solicitud preparada!</h2>
+      <p>Si WhatsApp no se abrió solo, tocá el botón de abajo y enviá el mensaje.</p>
+      <div class="aviso">
+        <strong>Tu turno queda pendiente de confirmación por Adrián.</strong><br>
+        Te va a responder por WhatsApp para confirmar fecha y horario.
+      </div>
+      <a class="btn-wa" id="linkWhatsapp" href="#" target="_blank" rel="noopener">Abrir WhatsApp</a>
+      <button type="button" class="btn-volver" id="btnNuevo">Hacer otra solicitud</button>
+    </section>
+
+  </main>
+
+  <script>
+    (function () {
+      "use strict";
+
+      // Número comercial (formato internacional para Argentina móvil)
+      var WHATSAPP = "5493804202997";
+
+      var inicio = document.getElementById("inicio");
+      var pantallaForm = document.getElementById("pantallaForm");
+      var confirmacion = document.getElementById("confirmacion");
+      var form = document.getElementById("formTurno");
+      var linkWhatsapp = document.getElementById("linkWhatsapp");
+
+      function mostrar(seccion) {
+        [inicio, pantallaForm, confirmacion].forEach(function (s) {
+          s.classList.add("oculto");
+        });
+        seccion.classList.remove("oculto");
+        window.scrollTo(0, 0);
+      }
+
+      // Fecha mínima = hoy (hora local del dispositivo)
+      function hoyISO() {
+        var d = new Date();
+        var mes = String(d.getMonth() + 1).padStart(2, "0");
+        var dia = String(d.getDate()).padStart(2, "0");
+        return d.getFullYear() + "-" + mes + "-" + dia;
+      }
+      document.getElementById("fecha").min = hoyISO();
+
+      function formatearFecha(iso) {
+        var p = iso.split("-");
+        return p[2] + "/" + p[1] + "/" + p[0];
+      }
+
+      function marcar(input, ok) {
+        var campo = input.closest(".campo");
+        input.classList.toggle("invalido", !ok);
+        campo.classList.toggle("con-error", !ok);
+      }
+
+      function validar() {
+        var ok = true;
+        var primerError = null;
+
+        function chequear(id, condicion) {
+          var el = document.getElementById(id);
+          marcar(el, condicion);
+          if (!condicion) {
+            ok = false;
+            if (!primerError) primerError = el;
+          }
+        }
+
+        var nombre = document.getElementById("nombre").value.trim();
+        chequear("nombre", nombre.length >= 3 && /\s/.test(nombre));
+
+        var tel = document.getElementById("telefono").value.replace(/\D/g, "");
+        chequear("telefono", tel.length >= 8 && tel.length <= 13);
+
+        chequear("localidad", document.getElementById("localidad").value.trim().length >= 2);
+        chequear("direccion", document.getElementById("direccion").value.trim().length >= 4);
+        chequear("servicio", document.getElementById("servicio").value !== "");
+        chequear("propiedad", document.getElementById("propiedad").value !== "");
+
+        var fecha = document.getElementById("fecha").value;
+        chequear("fecha", fecha !== "" && fecha >= hoyISO());
+
+        chequear("horario", document.getElementById("horario").value !== "");
+
+        if (primerError) primerError.focus();
+        return ok;
+      }
+
+      function armarMensaje() {
+        var v = function (id) { return document.getElementById(id).value.trim(); };
+        var obs = v("observaciones") || "Sin observaciones";
+
+        return [
+          "Hola Adrián, quiero solicitar un turno de fumigación.",
+          "",
+          "*Nombre y apellido:* " + v("nombre"),
+          "*Teléfono:* " + v("telefono"),
+          "*Localidad:* " + v("localidad"),
+          "*Dirección:* " + v("direccion"),
+          "*Servicio / plaga:* " + v("servicio"),
+          "*Tipo de propiedad:* " + v("propiedad"),
+          "*Fecha preferida:* " + formatearFecha(v("fecha")),
+          "*Horario preferido:* " + v("horario"),
+          "*Observaciones:* " + obs,
+          "",
+          "Quedo a la espera de la confirmación del turno. ¡Gracias!"
+        ].join("\n");
+      }
+
+      // Quitar el error apenas el usuario corrige el campo
+      form.addEventListener("input", function (e) {
+        if (e.target.classList.contains("invalido")) {
+          marcar(e.target, true);
+        }
+      });
+
+      document.getElementById("btnSolicitar").addEventListener("click", function () {
+        mostrar(pantallaForm);
+      });
+
+      document.getElementById("btnVolver").addEventListener("click", function () {
+        mostrar(inicio);
+      });
+
+      document.getElementById("btnNuevo").addEventListener("click", function () {
+        form.reset();
+        mostrar(inicio);
+      });
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        if (!validar()) return;
+
+        var url = "https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent(armarMensaje());
+        linkWhatsapp.href = url;
+
+        mostrar(confirmacion);
+        window.open(url, "_blank", "noopener");
+      });
+    })();
+  </script>
+</body>
+</html>
