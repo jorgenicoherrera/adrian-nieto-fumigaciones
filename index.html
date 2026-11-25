@@ -567,7 +567,7 @@
 
     if (!validar()) return;
 
-    if (SUPABASE_KEY === "sb_publishable_FwjJLo8cvHvVQxXvUTJZyw_UWMzciPU") {
+   if (SUPABASE_KEY === "PEGAR_AQUI_LA_PUBLISHABLE_KEY") {
       alert("Falta configurar la clave pública de Supabase.");
       return;
     }
@@ -628,6 +628,188 @@
       boton.textContent = "Enviar por WhatsApp";
     }
   });
+})();
+</script>
+
+<!-- PANEL PRIVADO DE ADMINISTRACIÓN -->
+<section id="panel-admin" style="display:none;position:fixed;inset:0;z-index:99999;background:#101827;color:white;overflow:auto;padding:24px;font-family:Arial,sans-serif">
+  <div style="max-width:1000px;margin:auto">
+    <h1>Panel de administración</h1>
+    <p>Adrián Nieto Fumigaciones</p>
+
+    <div id="login-admin" style="background:#1e293b;padding:20px;border-radius:12px;margin-top:20px;max-width:420px">
+      <h2>Acceso privado</h2>
+      <input id="email-admin" type="email" placeholder="Correo electrónico" style="display:block;width:100%;padding:13px;margin:12px 0;color:#111">
+      <input id="password-admin" type="password" placeholder="Contraseña" style="display:block;width:100%;padding:13px;margin:12px 0;color:#111">
+      <button id="ingresar-admin" style="padding:13px;width:100%;background:#16a34a;color:white;border:0;border-radius:8px">Ingresar</button>
+      <p id="mensaje-login" style="margin-top:12px"></p>
+    </div>
+
+    <div id="contenido-admin" style="display:none">
+      <h2 style="margin-top:25px">Solicitudes de turnos</h2>
+      <button id="actualizar-turnos" style="padding:12px;background:#2563eb;color:white;border:0;border-radius:8px;margin:12px 0">Actualizar solicitudes</button>
+      <div id="lista-turnos"></div>
+    </div>
+
+    <button id="cerrar-panel" style="padding:12px;background:#dc3545;color:white;border:0;border-radius:8px;margin-top:25px">Cerrar sesión</button>
+  </div>
+</section>
+
+<script>
+(function () {
+  const URL = "https://cdoyirqyyuahrirouvqe.supabase.co";
+  const KEY = "sb_publishable_FwjJLo8cvHvVQxXvUTJZyw_UWMzciPU";
+
+  const panel = document.getElementById("panel-admin");
+  const login = document.getElementById("login-admin");
+  const contenido = document.getElementById("contenido-admin");
+  const mensaje = document.getElementById("mensaje-login");
+  const lista = document.getElementById("lista-turnos");
+
+  let db = null;
+
+  function abrirPanel() {
+    panel.style.display = "block";
+  }
+
+  if (window.location.hash === "#admin") {
+    abrirPanel();
+  }
+
+  async function cargarTurnos() {
+    lista.textContent = "Cargando solicitudes...";
+
+    const { data, error } = await db
+      .from("appointments")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      lista.textContent = "Error al cargar: " + error.message;
+      return;
+    }
+
+    lista.innerHTML = "";
+
+    if (!data || data.length === 0) {
+      lista.textContent = "Todavía no hay solicitudes.";
+      return;
+    }
+
+    data.forEach(turno => {
+      const tarjeta = document.createElement("div");
+      tarjeta.style.cssText = "background:#1e293b;padding:18px;margin:14px 0;border-radius:12px";
+
+      const titulo = document.createElement("h3");
+      titulo.textContent = turno.customer_name + " — " + turno.service_name;
+
+      const datos = document.createElement("p");
+      datos.style.cssText = "line-height:1.8;margin:12px 0";
+      datos.textContent =
+        "Teléfono: " + turno.phone +
+        " | Localidad: " + turno.locality +
+        " | Dirección: " + turno.address +
+        " | Fecha: " + turno.date +
+        " | Horario: " + turno.start_time +
+        " | Propiedad: " + turno.property_type;
+
+      const estado = document.createElement("select");
+      estado.style.cssText = "display:block;width:100%;padding:12px;margin:10px 0;color:#111";
+
+      ["pendiente", "confirmado", "cancelado", "reprogramar"].forEach(op => {
+        const opcion = document.createElement("option");
+        opcion.value = op;
+        opcion.textContent = op;
+        if (turno.status === op) opcion.selected = true;
+        estado.appendChild(opcion);
+      });
+
+      const notas = document.createElement("textarea");
+      notas.value = turno.admin_notes || "";
+      notas.placeholder = "Notas administrativas";
+      notas.style.cssText = "display:block;width:100%;padding:12px;margin:10px 0;min-height:75px;color:#111";
+
+      const guardar = document.createElement("button");
+      guardar.textContent = "Guardar cambios";
+      guardar.style.cssText = "padding:12px;background:#16a34a;color:white;border:0;border-radius:8px";
+
+      guardar.onclick = async () => {
+        guardar.disabled = true;
+
+        const { error } = await db
+          .from("appointments")
+          .update({
+            status: estado.value,
+            admin_notes: notas.value
+          })
+          .eq("id", turno.id);
+
+        guardar.disabled = false;
+
+        if (error) {
+          alert("Error al guardar: " + error.message);
+        } else {
+          alert("Cambios guardados.");
+          cargarTurnos();
+        }
+      };
+
+      tarjeta.append(titulo, datos, estado, notas, guardar);
+      lista.appendChild(tarjeta);
+    });
+  }
+
+  document.getElementById("ingresar-admin").onclick = async () => {
+    mensaje.textContent = "Verificando acceso...";
+
+    try {
+      if (!window.supabase) {
+        throw new Error("No se pudo cargar Supabase.");
+      }
+
+      if (!db) {
+        db = window.supabase.createClient(URL, KEY);
+      }
+
+      const email = document.getElementById("email-admin").value.trim();
+      const password = document.getElementById("password-admin").value;
+
+      const { error } = await db.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) throw error;
+
+      const { data: autorizado, error: errorAdmin } =
+        await db.rpc("is_admin");
+
+      if (errorAdmin) throw errorAdmin;
+
+      if (!autorizado) {
+        await db.auth.signOut();
+        throw new Error("Este usuario no tiene permisos de administrador.");
+      }
+
+      login.style.display = "none";
+      contenido.style.display = "block";
+      mensaje.textContent = "";
+
+      await cargarTurnos();
+
+    } catch (error) {
+      mensaje.textContent = error.message;
+    }
+  };
+
+  document.getElementById("actualizar-turnos").onclick = cargarTurnos;
+
+  document.getElementById("cerrar-panel").onclick = async () => {
+    if (db) await db.auth.signOut();
+    contenido.style.display = "none";
+    login.style.display = "block";
+    document.getElementById("password-admin").value = "";
+  };
 })();
 </script>
 
