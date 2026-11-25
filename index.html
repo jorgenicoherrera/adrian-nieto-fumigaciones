@@ -437,132 +437,199 @@
 
   </main>
 
-  <script>
-    (function () {
-      "use strict";
 
-      // Número comercial (formato internacional para Argentina móvil)
-      var WHATSAPP = "5493804202997";
+<script>
+(function () {
+  "use strict";
 
-      var inicio = document.getElementById("inicio");
-      var pantallaForm = document.getElementById("pantallaForm");
-      var confirmacion = document.getElementById("confirmacion");
-      var form = document.getElementById("formTurno");
-      var linkWhatsapp = document.getElementById("linkWhatsapp");
+  var WHATSAPP = "5493804202997";
 
-      function mostrar(seccion) {
-        [inicio, pantallaForm, confirmacion].forEach(function (s) {
-          s.classList.add("oculto");
-        });
-        seccion.classList.remove("oculto");
-        window.scrollTo(0, 0);
+  var SUPABASE_URL = "https://cdoyirqyyuahrirouvqe.supabase.co";
+  var SUPABASE_KEY = "PEGAR_AQUI_TU_CLAVE_PUBLICABLE";
+
+  var FUNCTION_URL = SUPABASE_URL + "/functions/v1/guardar-solicitud";
+
+  var inicio = document.getElementById("inicio");
+  var pantallaForm = document.getElementById("pantallaForm");
+  var confirmacion = document.getElementById("confirmacion");
+  var form = document.getElementById("formTurno");
+  var linkWhatsapp = document.getElementById("linkWhatsapp");
+
+  function mostrar(seccion) {
+    [inicio, pantallaForm, confirmacion].forEach(function (s) {
+      s.classList.add("oculto");
+    });
+    seccion.classList.remove("oculto");
+    window.scrollTo(0, 0);
+  }
+
+  function hoyISO() {
+    var d = new Date();
+    return d.getFullYear() + "-" +
+      String(d.getMonth() + 1).padStart(2, "0") + "-" +
+      String(d.getDate()).padStart(2, "0");
+  }
+
+  document.getElementById("fecha").min = hoyISO();
+
+  function formatearFecha(iso) {
+    var p = iso.split("-");
+    return p[2] + "/" + p[1] + "/" + p[0];
+  }
+
+  function marcar(input, ok) {
+    var campo = input.closest(".campo");
+    input.classList.toggle("invalido", !ok);
+    campo.classList.toggle("con-error", !ok);
+  }
+
+  function validar() {
+    var ok = true;
+    var primerError = null;
+
+    function chequear(id, condicion) {
+      var el = document.getElementById(id);
+      marcar(el, condicion);
+      if (!condicion) {
+        ok = false;
+        if (!primerError) primerError = el;
       }
+    }
 
-      // Fecha mínima = hoy (hora local del dispositivo)
-      function hoyISO() {
-        var d = new Date();
-        var mes = String(d.getMonth() + 1).padStart(2, "0");
-        var dia = String(d.getDate()).padStart(2, "0");
-        return d.getFullYear() + "-" + mes + "-" + dia;
-      }
-      document.getElementById("fecha").min = hoyISO();
+    var nombre = document.getElementById("nombre").value.trim();
+    var tel = document.getElementById("telefono").value.replace(/\D/g, "");
 
-      function formatearFecha(iso) {
-        var p = iso.split("-");
-        return p[2] + "/" + p[1] + "/" + p[0];
-      }
+    chequear("nombre", nombre.length >= 3 && /\s/.test(nombre));
+    chequear("telefono", tel.length >= 8 && tel.length <= 13);
+    chequear("localidad", document.getElementById("localidad").value.trim().length >= 2);
+    chequear("direccion", document.getElementById("direccion").value.trim().length >= 4);
+    chequear("servicio", document.getElementById("servicio").value !== "");
+    chequear("propiedad", document.getElementById("propiedad").value !== "");
 
-      function marcar(input, ok) {
-        var campo = input.closest(".campo");
-        input.classList.toggle("invalido", !ok);
-        campo.classList.toggle("con-error", !ok);
-      }
+    var fecha = document.getElementById("fecha").value;
+    chequear("fecha", fecha !== "" && fecha >= hoyISO());
 
-      function validar() {
-        var ok = true;
-        var primerError = null;
+    chequear("horario", document.getElementById("horario").value !== "");
 
-        function chequear(id, condicion) {
-          var el = document.getElementById(id);
-          marcar(el, condicion);
-          if (!condicion) {
-            ok = false;
-            if (!primerError) primerError = el;
-          }
-        }
+    if (primerError) primerError.focus();
+    return ok;
+  }
 
-        var nombre = document.getElementById("nombre").value.trim();
-        chequear("nombre", nombre.length >= 3 && /\s/.test(nombre));
+  function armarMensaje() {
+    function v(id) {
+      return document.getElementById(id).value.trim();
+    }
 
-        var tel = document.getElementById("telefono").value.replace(/\D/g, "");
-        chequear("telefono", tel.length >= 8 && tel.length <= 13);
+    return [
+      "Hola Adrián, quiero solicitar un turno de fumigación.",
+      "",
+      "*Nombre y apellido:* " + v("nombre"),
+      "*Teléfono:* " + v("telefono"),
+      "*Localidad:* " + v("localidad"),
+      "*Dirección:* " + v("direccion"),
+      "*Servicio / plaga:* " + v("servicio"),
+      "*Tipo de propiedad:* " + v("propiedad"),
+      "*Fecha preferida:* " + formatearFecha(v("fecha")),
+      "*Horario preferido:* " + v("horario"),
+      "*Observaciones:* " + (v("observaciones") || "Sin observaciones"),
+      "",
+      "Quedo a la espera de la confirmación. ¡Gracias!"
+    ].join("\n");
+  }
 
-        chequear("localidad", document.getElementById("localidad").value.trim().length >= 2);
-        chequear("direccion", document.getElementById("direccion").value.trim().length >= 4);
-        chequear("servicio", document.getElementById("servicio").value !== "");
-        chequear("propiedad", document.getElementById("propiedad").value !== "");
+  function horaElegida(horario) {
+    if (horario.indexOf("Tarde") === 0) return "12:00";
+    if (horario.indexOf("Noche") === 0) return "18:00";
+    return "08:00";
+  }
 
-        var fecha = document.getElementById("fecha").value;
-        chequear("fecha", fecha !== "" && fecha >= hoyISO());
+  form.addEventListener("input", function (e) {
+    if (e.target.classList.contains("invalido")) {
+      marcar(e.target, true);
+    }
+  });
 
-        chequear("horario", document.getElementById("horario").value !== "");
+  document.getElementById("btnSolicitar").addEventListener("click", function () {
+    mostrar(pantallaForm);
+  });
 
-        if (primerError) primerError.focus();
-        return ok;
-      }
+  document.getElementById("btnVolver").addEventListener("click", function () {
+    mostrar(inicio);
+  });
 
-      function armarMensaje() {
-        var v = function (id) { return document.getElementById(id).value.trim(); };
-        var obs = v("observaciones") || "Sin observaciones";
+  document.getElementById("btnNuevo").addEventListener("click", function () {
+    form.reset();
+    mostrar(inicio);
+  });
 
-        return [
-          "Hola Adrián, quiero solicitar un turno de fumigación.",
-          "",
-          "*Nombre y apellido:* " + v("nombre"),
-          "*Teléfono:* " + v("telefono"),
-          "*Localidad:* " + v("localidad"),
-          "*Dirección:* " + v("direccion"),
-          "*Servicio / plaga:* " + v("servicio"),
-          "*Tipo de propiedad:* " + v("propiedad"),
-          "*Fecha preferida:* " + formatearFecha(v("fecha")),
-          "*Horario preferido:* " + v("horario"),
-          "*Observaciones:* " + obs,
-          "",
-          "Quedo a la espera de la confirmación del turno. ¡Gracias!"
-        ].join("\n");
-      }
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
 
-      // Quitar el error apenas el usuario corrige el campo
-      form.addEventListener("input", function (e) {
-        if (e.target.classList.contains("invalido")) {
-          marcar(e.target, true);
-        }
+    if (!validar()) return;
+
+    if (SUPABASE_KEY === "sb_publishable_FwjJLo8cvHvVQxXvUTJZyw_UWMzciPU") {
+      alert("Falta configurar la clave pública de Supabase.");
+      return;
+    }
+
+    var horario = document.getElementById("horario").value;
+    var datos = {
+      service_name: document.getElementById("servicio").value,
+      customer_name: document.getElementById("nombre").value.trim(),
+      phone: document.getElementById("telefono").value.trim(),
+      locality: document.getElementById("localidad").value.trim(),
+      address: document.getElementById("direccion").value.trim(),
+      property_type: document.getElementById("propiedad").value,
+      date: document.getElementById("fecha").value,
+      start_time: horaElegida(horario),
+      notes:
+        "Horario preferido: " + horario +
+        ". Observaciones: " +
+        (document.getElementById("observaciones").value.trim() || "Ninguna")
+    };
+
+    var urlWhatsApp = "https://wa.me/" + WHATSAPP +
+      "?text=" + encodeURIComponent(armarMensaje());
+
+    var ventana = window.open("about:blank", "_blank");
+
+    var boton = form.querySelector(".btn-enviar");
+    boton.disabled = true;
+    boton.textContent = "Enviando solicitud...";
+
+    try {
+      var respuesta = await fetch(FUNCTION_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_KEY
+        },
+        body: JSON.stringify(datos)
       });
 
-      document.getElementById("btnSolicitar").addEventListener("click", function () {
-        mostrar(pantallaForm);
-      });
+      var resultado = await respuesta.json();
 
-      document.getElementById("btnVolver").addEventListener("click", function () {
-        mostrar(inicio);
-      });
+      if (!respuesta.ok || !resultado.success) {
+        throw new Error(resultado.error || "No se pudo guardar la solicitud.");
+      }
 
-      document.getElementById("btnNuevo").addEventListener("click", function () {
-        form.reset();
-        mostrar(inicio);
-      });
+      linkWhatsapp.href = urlWhatsApp;
+      mostrar(confirmacion);
 
-      form.addEventListener("submit", function (e) {
-        e.preventDefault();
-        if (!validar()) return;
+      if (ventana) {
+        ventana.location.href = urlWhatsApp;
+      }
 
-        var url = "https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent(armarMensaje());
-        linkWhatsapp.href = url;
+    } catch (error) {
+      if (ventana) ventana.close();
+      alert("No pudimos registrar tu solicitud. " + error.message);
+    } finally {
+      boton.disabled = false;
+      boton.textContent = "Enviar por WhatsApp";
+    }
+  });
+})();
+</script>
 
-        mostrar(confirmacion);
-        window.open(url, "_blank", "noopener");
-      });
-    })();
-  </script>
 </body>
 </html>
